@@ -4,6 +4,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
+import xgboost as xgb
 
 
 df = pd.read_csv('data/nbfc_credit_data.csv')
@@ -26,3 +27,10 @@ y_pred = lr_model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 print(f"Accuracy: {accuracy:.2%}")
 print(classification_report(y_test, y_pred))
+
+xgb_model = xgb.XGBClassifier(eval_metric='logloss', scale_pos_weight=2.6)
+xgb_model.fit(X_train, y_train)
+
+xgb_pred = xgb_model.predict(X_test)
+print("XGBoost results:")
+print(classification_report(y_test, xgb_pred))
