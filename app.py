@@ -8,7 +8,6 @@ feature_names = joblib.load('features.pkl')
 explainer = joblib.load('explainer.pkl')
 
 st.title("Credit Engine")
-st.caption("Synthetic data — scores and metrics are for demonstration, not real-world performance.")
 
 def decision(score):
     if score >= 750:
