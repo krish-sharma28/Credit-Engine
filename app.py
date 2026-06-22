@@ -34,3 +34,19 @@ xgb_model.fit(X_train, y_train)
 xgb_pred = xgb_model.predict(X_test)
 print("XGBoost results:")
 print(classification_report(y_test, xgb_pred))
+
+default_proba = xgb_model.predict_proba(X_test)[:, 1]
+scores = ((1 - default_proba) * 1000).astype(int)
+
+print(scores[:5])
+
+def decision(score):
+    if score >= 750:
+        return "Approve"
+    elif score >= 600:
+        return "Review"
+    else:
+        return "Reject"
+    
+for s in scores[:5]:
+    print(s, "->", decision(s))
