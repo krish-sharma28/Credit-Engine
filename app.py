@@ -5,6 +5,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 import xgboost as xgb
+import shap
+import numpy as np
+
 
 
 df = pd.read_csv('data/nbfc_credit_data.csv')
@@ -50,3 +53,20 @@ def decision(score):
     
 for s in scores[:5]:
     print(s, "->", decision(s))
+
+explainer = shap.TreeExplainer(xgb_model)
+shap_values = explainer.shap_values(X_test)
+
+print(shap_values.shape)
+
+
+feature_names = X.columns
+borrower_shap = shap_values[0]
+
+contributions = sorted(zip(feature_names, borrower_shap), key=lambda x: abs(x[1]), reverse=True)
+
+print("Why borrower 0 got their score:")
+for name, val in contributions[:5]:
+    direction = "increased risk" if val > 0 else "lowered risk"
+    print(f"  {name}: {direction} ({val:+.2f})")
+
