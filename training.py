@@ -16,6 +16,20 @@ df = pd.read_csv('data/nbfc_credit_data.csv')
 
 y = df['default']
 X = df.drop(columns=['default', 'nbfc'])
+
+X['cibil_available'] = (X['cibil_score'] != -1).astype(int)
+X['cibil_score'] = X['cibil_score'].replace(-1, np.nan)
+
+X['gst_available'] = (X['gst_filing_regular'] != -1).astype(int)
+X['gst_filing_regular'] = X['gst_filing_regular'].replace(-1, np.nan)
+
+X['loan_to_income_ratio'] = X['loan_amount_inr'] / X['monthly_income_inr']
+X['emi_to_income_ratio'] = (X['loan_amount_inr'] / X['loan_tenure_months']) / X['monthly_income_inr']
+X['balance_to_loan_ratio'] = X['avg_bank_balance_inr'] / X['loan_amount_inr']
+
+X = X.drop(columns=['avg_bank_balance_inr'])
+
+
 X = pd.get_dummies(X, columns=['loan_type', 'employment_type'])
 feature_names = X.columns.tolist()
 
@@ -27,13 +41,13 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-lr_model = LogisticRegression(max_iter=1000, class_weight='balanced')
-lr_model.fit(X_train, y_train)
+#lr_model = LogisticRegression(max_iter=1000, class_weight='balanced')
+#lr_model.fit(X_train, y_train)
 
-y_pred = lr_model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy:.2%}")
-print(classification_report(y_test, y_pred))
+#y_pred = lr_model.predict(X_test)
+#accuracy = accuracy_score(y_test, y_pred)
+#print(f"Accuracy: {accuracy:.2%}")
+#print(classification_report(y_test, y_pred))
 
 xgb_model = xgb.XGBClassifier(eval_metric='logloss', scale_pos_weight=2.6)
 xgb_model.fit(X_train, y_train)
